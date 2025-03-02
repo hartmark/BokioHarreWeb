@@ -1,0 +1,10 @@
+﻿@model BokioHarreWeb.DataContract.GetJournalEntriesResponse
+
+<h1>Items</h1>
+<p>Total Items: @Model.TotalItems</p>
+<p>Total Pages: @Model.TotalPages</p>
+<p>Current Page: @Model.CurrentPage</p>
+
+@await Html.PartialAsync("_Pagination", Model)
+@await Html.PartialAsync("_ItemList", Model.Items)
+@await Html.PartialAsync("_Pagination", Model)

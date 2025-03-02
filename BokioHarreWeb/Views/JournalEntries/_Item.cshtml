@@ -1,0 +1,22 @@
+@model BokioHarreWeb.DataContract.Item
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h5 class="card-title">@Model.Title</h5>
+        <h6 class="card-subtitle mb-2 text-muted">@Model.JournalEntryNumber - @Model.Date.ToShortDateString()</h6>
+    </div>
+    <div class="card-body">
+        <div>
+            @if (Model.Items is { Count: > 0 })
+            {
+                <div class="row">
+                    @await Html.PartialAsync("_SubItems", Model.Items)
+                </div>
+            }
+            else
+            {
+                <span>No sub items for @Model.Id</span>
+            }
+        </div>
+    </div>
+</div>

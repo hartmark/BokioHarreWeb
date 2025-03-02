@@ -1,0 +1,32 @@
+@model List<BokioHarreWeb.DataContract.SubItem>
+
+@if (Model is { Count: > 0 })
+{
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Account</th>
+                <th>Debit</th>
+                <th>Credit</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var subItem in Model)
+            {
+                <tr>
+                    <td>@subItem.Account</td>
+                    <td class="text-success">@(@subItem.Debit > 0 ? subItem.Debit.ToString("C") : "")</td>
+                    <td class="text-danger">@(@subItem.Credit > 0 ? subItem.Credit.ToString("C") : "")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="col-12">
+        <div class="alert alert-warning">No sub items found.</div>
+    </div>
+}
