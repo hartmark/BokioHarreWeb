@@ -1,7 +1,7 @@
-using BokioHarreWeb.DataContract;
+using Common.DataContract;
 using Refit;
 
-namespace BokioHarreWeb.Apis;
+namespace Common.Apis;
 
 public interface IBokioApi
 {

@@ -1,10 +1,52 @@
-﻿@model BokioHarreWeb.DataContract.GetJournalEntriesResponse
+<div id="itemsContainer" class="row gap-3">
+    <!-- Items will be appended here -->
+</div>
+<div id="loadMoreContainer" class="mt-3" style="display: none;">
+    <button id="fetchMoreBtn" class="btn btn-primary">Load More</button>
+</div>
 
-<h1>Items</h1>
-<p>Total Items: @Model.TotalItems</p>
-<p>Total Pages: @Model.TotalPages</p>
-<p>Current Page: @Model.CurrentPage</p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script>
+    let currentPage = 0;
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    const fetchMoreBtn = document.getElementById('fetchMoreBtn');
+    
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/itemHub") // This should match the route you defined in MapHub
+        .build();
 
-@await Html.PartialAsync("_Pagination", Model)
-@await Html.PartialAsync("_ItemList", Model.Items)
-@await Html.PartialAsync("_Pagination", Model)
+    // Handle incoming HTML fragments
+    connection.on("ReceiveItemHtml", (html) => {
+        const container = document.getElementById("itemsContainer");
+        if (container) {
+            container.insertAdjacentHTML('beforeend', html); // Appends at the end
+        } else {
+            console.error("Container 'itemsContainer' not found!");
+        }
+    });
+
+    // Handle load more visibility updates
+    connection.on("UpdateLoadMore", (hasMore) => {
+        console.log("Connection #" + hasMore);
+        loadMoreContainer.style.display = hasMore ? 'block' : 'none';
+    });
+    
+    connection.start()
+        .then(() => {
+            console.log("Connected to SignalR");
+            // Initial load
+            fetch(`/JournalEntries/StartStreaming?pageIndex=${currentPage}`, {
+                method: 'POST'
+            });
+        })
+        .catch(err => console.error(err));
+
+    // Load more button handler
+    fetchMoreBtn.addEventListener('click', () => {
+        currentPage++;
+        loadMoreContainer.style.display = 'none';
+        fetch(`/JournalEntries/StartStreaming?pageIndex=${currentPage}`, {
+            method: 'POST'
+        });
+    });
+</script>

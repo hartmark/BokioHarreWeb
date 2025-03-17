@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BokioHarreWeb", "BokioHarreWeb\BokioHarreWeb.csproj", "{E1C9662E-205E-46E5-B306-5C20A8D50963}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BokioHarreConsole", "BokioHarreConsole\BokioHarreConsole.csproj", "{90DC5BE2-7A0C-45D1-BAB9-335B1BB80D74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{56E08663-17D6-4F5D-A5F8-40625B1A02B0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{E1C9662E-205E-46E5-B306-5C20A8D50963}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1C9662E-205E-46E5-B306-5C20A8D50963}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1C9662E-205E-46E5-B306-5C20A8D50963}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90DC5BE2-7A0C-45D1-BAB9-335B1BB80D74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90DC5BE2-7A0C-45D1-BAB9-335B1BB80D74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90DC5BE2-7A0C-45D1-BAB9-335B1BB80D74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90DC5BE2-7A0C-45D1-BAB9-335B1BB80D74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56E08663-17D6-4F5D-A5F8-40625B1A02B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56E08663-17D6-4F5D-A5F8-40625B1A02B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56E08663-17D6-4F5D-A5F8-40625B1A02B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56E08663-17D6-4F5D-A5F8-40625B1A02B0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

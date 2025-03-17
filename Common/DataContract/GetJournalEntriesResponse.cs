@@ -1,4 +1,4 @@
-namespace BokioHarreWeb.DataContract;
+namespace Common.DataContract;
 
 public record GetJournalEntriesResponse
 {

@@ -1,4 +1,6 @@
-namespace BokioHarreWeb.Handlers;
+using Microsoft.Extensions.Configuration;
+
+namespace Common.Handlers;
 
 public class TokenHandler : DelegatingHandler
 {

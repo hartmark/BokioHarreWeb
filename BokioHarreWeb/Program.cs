@@ -1,6 +1,8 @@
 using System.Globalization;
-using BokioHarreWeb.Apis;
-using BokioHarreWeb.Handlers;
+using BokioHarreWeb.Hubs;
+using Common.Apis;
+using Common.Handlers;
+using Common.Services;
 using Microsoft.AspNetCore.Localization;
 using Refit;
 
@@ -10,13 +12,27 @@ var baseUri = builder.Configuration["BokioApiUrl"] ?? throw new InvalidOperation
 
 builder.Services.AddTransient<TokenHandler>();
 builder.Services.AddRefitClient<IBokioApi>()
-    .ConfigureHttpClient(c =>
+    .ConfigureHttpClient(httpClient =>
     {
-        c.BaseAddress = new Uri(baseUri);
+        httpClient.BaseAddress = new Uri(baseUri);
     })
     .AddHttpMessageHandler<TokenHandler>();
 
+builder.Services.AddTransient<IJournalService, JournalService>();
+
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        x =>
+        {
+            x.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
 
 var app = builder.Build();
 
@@ -38,12 +54,16 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseCors("AllowAllOrigins");
+
 app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.MapHub<ItemHub>("/itemHub");
 
 app.MapControllerRoute(
         name: "default",
