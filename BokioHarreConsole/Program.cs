@@ -1,11 +1,16 @@
 ﻿using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using Common.Apis;
+using Common.Extensions;
 using Common.Handlers;
 using Common.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Refit;
 using Spectre.Console;
+using StringExtensions = Common.Extensions.StringExtensions;
 
 var cultureInfo = new CultureInfo("sv-SE");
 Thread.CurrentThread.CurrentCulture = cultureInfo;
@@ -39,51 +44,57 @@ serviceCollection.AddTransient<IJournalService, JournalService>();
 
 var serviceProvider = serviceCollection.BuildServiceProvider();
 
+int[] borrowAccounts = [2829, 2893, 2892, 2898];
+
 var bokioApi = serviceProvider.GetRequiredService<IJournalService>();
-var journalEntries = bokioApi.GetJournalEntries();
+var journalEntries = bokioApi.GetJournalEntries()
+    .ToBlockingEnumerable()
+    .Where(x => x.Date.Year >= 2024)
+    .Where(x => x.ReversingJournalEntryId is null)
+    .Where(x => x.Items != null && x.Items.Any(y => borrowAccounts.Any(z => z == y.Account)))
+    .OrderBy(x => x.Date)
+    .Select(x =>
+    {
+        var items = x.Items!
+            .Single(y => borrowAccounts.Any(z => z == y.Account));
+        return new
+        {
+            x.Date,
+            x.JournalEntryNumber,
+            Title = (x.Title ?? string.Empty).Unescape(),
+            items.Account,
+            items.Debit,
+            items.Credit,
+            Rest = x
+        };
+    })
+    .ToList();
 
 var table = new Table
 {
-    Title = new TableTitle("Journal Entries"),
-    ShowHeaders = false,
-    Border = TableBorder.None
+    Title = new TableTitle("Journal Entries")
 };
 
-table.AddColumn("");
+table.AddColumn(new TableColumn("Datum"));
+table.AddColumn(new TableColumn("Ver"));
+table.AddColumn(new TableColumn("Beskrivning"));
+table.AddColumn(new TableColumn("Konto"));
+table.AddColumn(new TableColumn("Debet"));
+table.AddColumn(new TableColumn("Kredit"));
 
-await foreach (var item in journalEntries)
+foreach (var item in journalEntries)
 {
-    var itemTable = new Table
-    {
-        ShowHeaders = false,
-        Border = TableBorder.None
-    };
-    itemTable.AddColumn(string.Empty);
-    itemTable.AddRow($"{item.JournalEntryNumber}: {item.Title}");
-    itemTable.AddRow(item.Date.ToShortDateString());
+    table.AddRow(
+        item.Date.ToShortDateString(),
+        item.JournalEntryNumber!,
+        item.Title,
+        item.Account.ToString(),
+        GetFormattedAmount(item.Debit),
+        GetFormattedAmount(item.Credit)
+    );
 
-    var subTable = new Table();
-
-    if (item.Items == null)
-    {
-        continue;
-    }
-    
-    subTable.AddColumn(new TableColumn("Account"));
-    subTable.AddColumn(new TableColumn("Debit"));
-    subTable.AddColumn(new TableColumn("Credit"));
-    foreach (var subItem in item.Items!)
-    {
-        subTable.AddRow(
-            subItem.Account.ToString(),
-            GetFormattedAmount(subItem.Debit),
-            GetFormattedAmount(subItem.Credit));
-    }
-    
-    itemTable.AddRow(subTable);
-    table.AddRow(itemTable);
 }
-
+table.Caption = new TableTitle($"Antal rader: {journalEntries.Count}"); 
 AnsiConsole.Write(table);
 
 return;
